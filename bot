@@ -1,0 +1,50 @@
+import openai
+import os
+import schedule
+import time
+import logging
+from dotenv import load_dotenv
+
+# Load API key securely from .env file
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
+
+# Initialize OpenAI Client
+client = openai.Client(api_key=api_key)
+
+# Function to generate chatbot response
+def get_chatbot_response(user_input):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": user_input}]
+        )
+        return response.choices[0].message.content  # Extract AI response
+    except Exception as e:
+        return f"Error generating response: {str(e)}"
+
+# Function to automatically post content
+def auto_post():
+    sample_post = "Hello, this is an automated post! #AI #Automation"
+    print("Posting:", sample_post)
+    logging.info(f"Posted: {sample_post}")
+
+# Function to automatically reply to messages
+def auto_reply():
+    user_input = input("User: ")  # Take user input
+    response = get_chatbot_response(user_input)
+    print("Bot:", response)
+    logging.info(f"User: {user_input}")
+    logging.info(f"Bot: {response}")
+
+# Logs bot actions for debugging
+def log_bot_activity():
+    logging.basicConfig(filename='bot_activity.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+    logging.info("Bot started and logging initialized.")
+
+if __name__ == "__main__":
+    log_bot_activity()
+    
+    # Keep asking for user input in a loop
+    while True:
+        auto_reply()
